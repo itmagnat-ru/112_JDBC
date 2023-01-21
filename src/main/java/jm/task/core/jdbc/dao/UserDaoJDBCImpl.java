@@ -3,6 +3,7 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,62 +13,58 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
     public UserDaoJDBCImpl() {
-
+    //todo по условиям задачи должен быть пустой конструктор
     }
-
+    @Override
     public void createUsersTable() {
-        try (Statement statement = Util.getConnection().createStatement()){
-            String sql = "CREATE TABLE `users` (\n" +
-                    "  `id` INT NOT NULL AUTO_INCREMENT,\n" +
-                    "  `name` VARCHAR(45) NULL,\n" +
-                    "  `lastName` VARCHAR(45) NULL,\n" +
-                    "  `age` INT NULL,\n" +
-                    "        PRIMARY KEY (`id`))";
-            statement.execute(sql);
+        final String CREATE = "CREATE TABLE `users` (\n" +
+                "  `id` INT NOT NULL AUTO_INCREMENT,\n" +
+                "  `name` VARCHAR(45) NULL,\n" +
+                "  `lastName` VARCHAR(45) NULL,\n" +
+                "  `age` INT NULL,\n" +
+                "        PRIMARY KEY (`id`))";
+        try (PreparedStatement ps = Util.getConnection().prepareStatement(CREATE)){
+            ps.execute();
             System.out.println("Таблица создана");
         } catch (SQLException ex) {
             System.out.println("Ошибка при создании таблицы" + ex);
         }
     }
-
+    @Override
     public void dropUsersTable() {
-        try (Statement statement = Util.getConnection().createStatement()){
-            String sql = "DROP TABLE users";
-            statement.executeUpdate(sql);
+        try (PreparedStatement ps = Util.getConnection().prepareStatement("DROP TABLE IF EXISTS users")){
+            ps.execute();
             System.out.println("Таблица удалена");
         } catch (SQLException ex) {
             System.out.println("Ошибка при удалении таблицы" + ex);
         }
     }
-
+    @Override
     public void saveUser(String name, String lastName, byte age) {
-
-        try (Statement statement = Util.getConnection().createStatement()) {
-            String sql = "INSERT INTO users (name, lastName, age) " +
-                    "values ('"
-                    + name
-                    + "','"
-                    + lastName
-                    + "',"
-                    + age
-                    + ")";
-            statement.executeUpdate(sql);
+        final String ADD = "INSERT INTO users (name, lastName, age) values (?, ?, ?)";
+        try (PreparedStatement ps = Util.getConnection().prepareStatement(ADD)) {
+            ps.setString(1, name);
+            ps.setString(2, lastName);
+            ps.setByte(3, age);
+            ps.executeUpdate();
             System.out.println("User с именем – " + name + " добавлен в базу данных");
         } catch (SQLException ex) {
             System.out.println("Ошибка сохранения пользователя" + ex);
         }
 
     }
-
+    @Override
     public void removeUserById(long id) {
-        try (Statement statement = Util.getConnection().createStatement()){
-            String sql = "DELETE FROM users WHERE id=" + id;
-            statement.executeUpdate(sql);
+        final String DELETE_BY_ID = "DELETE FROM users WHERE id = ?";
+        try (PreparedStatement ps = Util.getConnection().prepareStatement(DELETE_BY_ID)){
+            ps.setDouble(1,id);
+            ps.executeUpdate();
+            System.out.println("Пользователь с id=" + id + " удалён из БД");
         } catch (SQLException e) {
             System.out.println("Ошибка удаления пользователя из БД" + e.getMessage());
         }
     }
-
+    @Override
     public List<User> getAllUsers() {
         String sql = "SELECT * FROM users";
         try (Statement statement = Util.getConnection().createStatement()){
@@ -91,11 +88,11 @@ public class UserDaoJDBCImpl implements UserDao {
         return null;
         }
     }
-
+    @Override
     public void cleanUsersTable() {
-        try (Statement statement = Util.getConnection().createStatement()){
-            String sql = "DELETE FROM users";
-            statement.executeUpdate(sql);
+        try (PreparedStatement ps = Util.getConnection().prepareStatement("DELETE FROM users")){
+            ps.execute();
+            System.out.println("Таблица очищена");
         } catch (SQLException ex) {
             System.out.println("Ошибка очистки таблицы" + ex);
         }
