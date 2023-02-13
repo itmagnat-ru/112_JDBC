@@ -1,11 +1,13 @@
 package jm.task.core.jdbc.model;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Objects;
 
-@Table
+@Entity
+@Table(name = "Users")
 public class User {
     @Id
     private Long id;
@@ -29,9 +31,7 @@ public class User {
         this.age = age;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
     public void setId(Long id) {
         this.id = id;
