@@ -1,5 +1,5 @@
 package jm.task.core.jdbc;
-//todo спросить почему нужен имопрт
+
 import jm.task.core.jdbc.dao.UserDao;
 import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 
@@ -10,7 +10,6 @@ public class Main {
 
         userDao.dropUsersTable();
         userDao.createUsersTable();
-
 
 
         userDao.saveUser("Name1", "LastName1", (byte) 20);
